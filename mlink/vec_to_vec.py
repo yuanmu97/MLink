@@ -20,7 +20,8 @@ def build_ModelLink_vec2vec(input_len, output_len,
         mlink (keras Model): ModelLink model
     """
     mlink = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(output_len*hidden, input_shape=(input_len, )),
+        tf.keras.layers.InputLayer(input_shape=(input_len,)),
+        tf.keras.layers.Dense(output_len*hidden),
         tf.keras.layers.Dropout(dropout),
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.Dense(output_len, activation=output_activation),

@@ -12,13 +12,16 @@ We consider two abstract models, one for car counting and another for person cou
 > 1. 确定模型任务
 > 2. gtav 的标签需要用 matlab 读取
 
-## deeplabv3
+## segmentation links
 
-For more comprehensive evaluations on real-world video analytics, we use [DeepLabV3](https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/) model for lane line segmentation.
+For more comprehensive evaluations on real-world video analytics, we use [DeepLabV3](https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/) model for semantic segmentation on our collected traffic videos.
+
+Running DeepLabV3 on video frames:
+
+
 
 ## sensitivity to output dimension
 
-## linking for domain adaptation
 
 ## communication-overhead
 

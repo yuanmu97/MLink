@@ -13,7 +13,7 @@ class BBoxIoU(tf.keras.metrics.Metric):
         self.count = self.add_weight(name='count', initializer='zeros')
         
 
-    def update_state(self, y_true, y_pred):
+    def update_state(self, y_true, y_pred, sample_weight=None):
         """update_state
         Args:
             y_true, y_pred (array): [BATCHSIZE*[x, y, w, h]]

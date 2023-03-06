@@ -8,17 +8,35 @@ For Cityscale, we use the [gtFine_trainvaltest.zip](https://www.cityscapes-datas
 
 We consider two abstract models, one for car counting and another for person counting, and use annotations as simulated outputs.
 
-> TODO  
-> 1. 确定模型任务
-> 2. gtav 的标签需要用 matlab 读取
-
 ## segmentation links
 
 For more comprehensive evaluations on real-world video analytics, we use [DeepLabV3](https://pytorch.org/hub/pytorch_vision_deeplabv3_resnet101/) model for semantic segmentation on our collected traffic videos.
 
-Running DeepLabV3 on video frames:
+DeepLabV3 predicts pixel-level segmentation of 21 types of objects:
+```python
+labelnames = ['__background__', 'aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus',
+ 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike',
+ 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+```
 
+Run DeepLabV3 on video frames:
+```bash
+python run_deeplab3.py
+# segmentation predictions are saved in ./deeplabv3_predictions/
+```
 
+Next, generate three levels of outputs related to "car" labels:
+
+1. pixel-level mask
+2. bounding box
+3. existence flag
+
+Run `python generate_outputs.py`.
+
+Obviously, the higher level outputs can be easily computed using lower level ones, e.g., `[min(maskx), min(masky), max(maskx), max(masky)]=bbox` and `(len(bbox_list)!=0)=existence`.
+So we are interested in predicting lowe-level outputs using higher level ones with MLink.
+
+case#1: existence flag -> bounding box (`mlink_existence_to_bbox.py`). Not surprisingly, using only the flag that indicates whether cars exist cannot effectively predict cars' bounding boxes. The test bboxIoU is less than 5e-04.
 
 ## sensitivity to output dimension
 

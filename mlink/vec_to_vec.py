@@ -83,7 +83,7 @@ def train_ModelLink_vec2vec(mlink, X, Y,
             save_best_only=True
         )
     else:
-        mcp_saver = tf.keras.callbacks.ModelCheckpoint(+weight_path+'.BEST', 
+        mcp_saver = tf.keras.callbacks.ModelCheckpoint(weight_path+'.BEST', 
             monitor='val_loss', 
             mode='min',
             save_best_only=True
@@ -94,8 +94,7 @@ def train_ModelLink_vec2vec(mlink, X, Y,
                     batch_size=batch_size,
                     epochs=epochs,
                     callbacks=[tb_callback, mcp_saver],
-                    validation_data=validation_data,
-                    verbose=0)
+                    validation_data=validation_data)
     
     # checkpoint
     mlink.save(weight_path+'.LAST')

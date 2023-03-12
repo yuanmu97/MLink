@@ -1,6 +1,5 @@
 import tensorflow as tf 
-import numpy as np 
-from .utils import BBoxIoU
+from .utils import BBoxIoU, BinaryIoU
 
 
 def build_ModelLink_vec2vec(input_len, output_len,
@@ -21,7 +20,7 @@ def build_ModelLink_vec2vec(input_len, output_len,
     """
     mlink = tf.keras.models.Sequential([
         tf.keras.layers.InputLayer(input_shape=(input_len,)),
-        tf.keras.layers.Dense(output_len*hidden),
+        tf.keras.layers.Dense(int(output_len*hidden)),
         tf.keras.layers.Dropout(dropout),
         tf.keras.layers.Activation('relu'),
         tf.keras.layers.Dense(output_len, activation=output_activation),
@@ -63,6 +62,8 @@ def train_ModelLink_vec2vec(mlink, X, Y,
     
     if metric == "iou":
         metrics = [BBoxIoU()]
+    elif metric == "binary_iou":
+        metrics = [BinaryIoU()]
     else:
         metrics = [metric]
 

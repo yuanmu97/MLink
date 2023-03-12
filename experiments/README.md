@@ -36,7 +36,9 @@ Run `python generate_outputs.py`.
 Obviously, the higher level outputs can be easily computed using lower level ones, e.g., `[min(maskx), min(masky), max(maskx), max(masky)]=bbox` and `(len(bbox_list)!=0)=existence`.
 So we are interested in predicting lowe-level outputs using higher level ones with MLink.
 
-case#1: existence flag -> bounding box (`mlink_existence_to_bbox.py`). Not surprisingly, using only the flag that indicates whether cars exist cannot effectively predict cars' bounding boxes. The test bboxIoU is less than 5e-04.
+case#1: existence flag -> bounding box (`mlink_existence_to_bbox.py`). Not surprisingly, using only the flag that indicates whether cars exist cannot effectively predict cars' bounding boxes. The test bboxIoU is less than 4%.
+
+case#2: bounding box -> pixel-level mask (`mlink_bbox_to_mask.py`). Using the 4-dim bounding box cannot effectively predict pixel-level mask (409440-dim vector). The test binaryIoU is less than 1%.
 
 ## sensitivity to output dimension
 

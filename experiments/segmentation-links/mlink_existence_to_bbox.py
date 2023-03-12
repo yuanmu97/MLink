@@ -14,14 +14,16 @@ exis = np.load("existence.npy")
 bbox = np.load("boundingbox.npy")
 
 # random shuffle
-np.random.shuffle(exis)
-np.random.shuffle(bbox)
+idx_list = np.arange(exis.shape[0])
+np.random.shuffle(idx_list)
+exis = exis[idx_list]
+bbox = bbox[idx_list]
 
 # train-test split
 train_n = int(0.8*exis.shape[0])
 
 res = train_ModelLink_vec2vec(mlink, exis[:train_n], bbox[:train_n], 
                               test_X=exis[train_n:], test_Y=bbox[train_n:],
-                              learning_rate=0.1, batch_size=32, epochs=100,
+                              learning_rate=0.01, batch_size=32, epochs=100,
                               log_dir="logs/", weight_path="weights/exis2bbox.h5",
                               loss="mse", metric="iou")

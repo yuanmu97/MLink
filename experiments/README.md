@@ -1,12 +1,43 @@
 # Experiments
 
-## cityscale-gtav
+## cityscapes-gtav
 
 To evaluate the cross-domain adaptability of MLink, we use two video datasets, [Cityscale](https://www.cityscapes-dataset.com/) (street scenes in real cities) and [GTAV](https://download.visinf.tu-darmstadt.de/data/from_games/) (street scenes in computer games), as different domains.
 
-For Cityscale, we use the [gtFine_trainvaltest.zip](https://www.cityscapes-dataset.com/file-handling/?packageID=1) (241MB) package. And for GTAV, we use the [Part1](https://download.visinf.tu-darmstadt.de/data/from_games/data/01_labels.zip) data.
+We deploy [DeepLabv3Plus](https://github.com/VainF/DeepLabV3Plus-Pytorch) pretrained on Cityscapes and run inference on GTAV images. We save segmentation prediction as .npy files.
+```python
+'''
+DeepLabV3Plus-Pytorch/predict.py
+'''
+# ...
+    with torch.no_grad():
+        model = model.eval()
+        for img_path in tqdm(image_files):
+            ext = os.path.basename(img_path).split('.')[-1]
+            img_name = os.path.basename(img_path)[:-len(ext)-1]
+            img = Image.open(img_path).convert('RGB')
+            img = transform(img).unsqueeze(0) # To tensor of NCHW
+            img = img.to(device)
+            
+            pred = model(img).max(1)[1].cpu().numpy()[0] # HW
 
-We consider two abstract models, one for car counting and another for person counting, and use annotations as simulated outputs.
+            # colorized_preds = decode_fn(pred).astype('uint8')
+            # colorized_preds = Image.fromarray(colorized_preds)
+            # if opts.save_val_results_to:
+            #     colorized_preds.save(os.path.join(opts.save_val_results_to, img_name+opts.model+'.png'))
+    
+            np.save(os.path.join(opts.save_npy, img_name+".npy"), pred)
+# ...
+```
+Then we train a neural network that maps the segmentation prediction to groundtruth masks.
+See `train_seg_mlink.py`.
+We use Conv2D to extract features and use Conv2DTranspose for upsampling.
+Experimental results show that mlink cannot be effectively learned for such large (1052*1912) output spaces.
+
+
+<!-- For Cityscapes, we use the [gtFine_trainvaltest.zip](https://www.cityscapes-dataset.com/file-handling/?packageID=1) (241MB) package. And for GTAV, we use the [Part1](https://download.visinf.tu-darmstadt.de/data/from_games/data/01_labels.zip) data.
+
+We consider two abstract models, one for car counting and another for person counting, and use annotations as simulated outputs. -->
 
 ## segmentation links
 
@@ -34,7 +65,9 @@ Next, generate three levels of outputs related to "car" labels:
 Run `python generate_outputs.py`.
 
 Obviously, the higher level outputs can be easily computed using lower level ones, e.g., `[min(maskx), min(masky), max(maskx), max(masky)]=bbox` and `(len(bbox_list)!=0)=existence`.
-So we are interested in predicting lowe-level outputs using higher level ones with MLink.
+Our experiments verify this intuition: `mlink_bbox_to_existence.py` results in 100% val accuracy.
+However, since we use flattened mask as the input, `mlink_mask_to_bbox.py` only achieves 16.5% IoU.
+And we are interested in predicting lowe-level outputs using higher level ones with MLink.
 
 case#1: existence flag -> bounding box (`mlink_existence_to_bbox.py`). Not surprisingly, using only the flag that indicates whether cars exist cannot effectively predict cars' bounding boxes. The test bboxIoU is less than 4%.
 
